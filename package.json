@@ -1,7 +1,7 @@
 {
   "name": "broccoli-select",
   "version": "0.1.0",
-  "description": "Select/reject files based on a glob pattern",
+  "description": "A Broccoli plugin for selecting files based on glob patterns",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
