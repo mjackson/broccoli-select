@@ -1,3 +1,4 @@
+var fs = require('fs');
 var path = require('path');
 var mkdirp = require('mkdirp');
 var Writer = require('broccoli-writer');
@@ -11,7 +12,7 @@ function Select(inputTree, options) {
 
   options = options || {};
 
-  this.acceptFiles = options.acceptFiles || options.files || [ '**' ];
+  this.acceptFiles = options.acceptFiles || options.files || [ '**/*' ];
   this.rejectFiles = options.rejectFiles || [];
   this.outputDir = options.outputDir || '/';
   this.inputTree = inputTree;
@@ -26,14 +27,20 @@ Select.prototype.write = function (readTree, destDir) {
   var outputDir = this.outputDir;
 
   return readTree(this.inputTree).then(function (srcDir) {
-    rejectedFiles = getFilesRecursively(srcDir, rejectFiles);
-    acceptedFiles = getFilesRecursively(srcDir, acceptFiles).filter(function (file) {
-      return file && rejectedFiles.indexOf(file) === -1;
+    var rejectedFiles = getFilesRecursively(srcDir, rejectFiles);
+    var acceptedFiles = getFilesRecursively(srcDir, acceptFiles).filter(function (file) {
+      return rejectedFiles.indexOf(file) === -1;
     });
 
     acceptedFiles.forEach(function (file) {
-      mkdirp.sync(path.join(destDir, outputDir, path.dirname(file)));
-      helpers.copyPreserveSync(path.join(srcDir, file), path.join(destDir, outputDir, file));
+      var srcFile = path.join(srcDir, file);
+      var destFile = path.join(destDir, outputDir, file);
+      var stat = fs.lstatSync(srcFile);
+
+      if (stat.isFile() || stat.isSymbolicLink()) {
+        mkdirp.sync(path.dirname(destFile));
+        helpers.copyPreserveSync(srcFile, destFile, stat);
+      }
     });
   });
 };
