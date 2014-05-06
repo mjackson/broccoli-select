@@ -1,6 +1,6 @@
 {
   "name": "broccoli-select",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Select/reject files based on a glob pattern",
   "main": "index.js",
   "scripts": {
